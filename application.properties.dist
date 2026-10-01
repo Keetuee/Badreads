@@ -1,3 +1,0 @@
-# To run this project, rename this file to application.properties 
-# and paste your Google Books API key below:
-google.books.api.key=YOUR_API_KEY_HERE

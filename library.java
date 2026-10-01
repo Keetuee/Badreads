@@ -1,13 +1,19 @@
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Properties;
 import java.util.Scanner;
+import io.github.cdimascio.dotenv.Dotenv;
+
 
 public class library{
+    private final String apiKey;
+    public library() {
+        Dotenv dotenv = Dotenv.load();
+        this.apiKey = dotenv.get("API_KEY");
+    }
+
     public static void main(String[] args) {
         //Creating the input scanner
         Scanner idScanner =  new Scanner(System.in);
@@ -27,7 +33,6 @@ public class library{
 
     idScanner.close();
     //HTTPS fetch 
-     String apiKey = "";
      String targetUrl = "https://www.googleapis.com/books/v1/volumes?q=isbn:" + cleanedIsbn + "&key=" + apiKey;
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
