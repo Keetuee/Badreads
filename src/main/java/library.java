@@ -6,13 +6,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
-
-public class library{
+public class Library{
     private final String apiKey;
-    public library() {
+    public Library() {
         Dotenv dotenv = Dotenv.load();
         this.apiKey = dotenv.get("API_KEY");
     }
+
 
     public void main(String[] args) {
         //Creating the input scanner
