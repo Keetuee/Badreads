@@ -1,4 +1,4 @@
-package src.main.java;
+package Library;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,8 +12,6 @@ public class Library{
         Dotenv dotenv = Dotenv.load();
         this.apiKey = dotenv.get("API_KEY");
     }
-
-
     public void main(String[] args) {
         //Creating the input scanner
         Scanner idScanner =  new Scanner(System.in);
