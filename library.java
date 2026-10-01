@@ -1,20 +1,20 @@
 import java.util.Scanner;
-import java.util.scanner;
 public class library {
 
     public static void main(String[] args) {
         Scanner idScanner =  new Scanner(System.in);
     System.err.print("Input ISBN "); 
     String isbn = idScanner.nextLine();
-        if (isbn.matches("[0-9]+")) {
-            System.out.print("Only numbers");
-        
+        String cleanedIsbn = isbn.replaceAll("[\\s-]", "");
+
+    if (cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
+            System.out.print("Valid ISBN");
         }
-        else if (isbn.isEmpty()) {
+        else if (cleanedIsbn.isEmpty()) {
             System.out.println("Input empty");
         }
-            else
-                System.out.print("This ISBN is not valid");
+        else
+            System.out.print("This ISBN is not valid");
 
     idScanner.close();
     }
