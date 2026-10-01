@@ -1,3 +1,4 @@
+package src.main.java;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -6,7 +7,6 @@ import java.net.http.HttpResponse;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 
-
 public class library{
     private final String apiKey;
     public library() {
@@ -14,7 +14,7 @@ public class library{
         this.apiKey = dotenv.get("API_KEY");
     }
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         //Creating the input scanner
         Scanner idScanner =  new Scanner(System.in);
     System.err.print("Input ISBN "); 
