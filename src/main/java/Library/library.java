@@ -12,16 +12,25 @@ public class Library{
         Dotenv dotenv = Dotenv.load();
         this.apiKey = dotenv.get("API_KEY");
     }
+
     public void main(String[] args) {
         String isbn = getISBN();
-        bookData(isbn);
+        String response = bookData(isbn);
+        if (response != null) {
+            if (response.contains("\"totalItems\": 0")) {
+                System.out.println("No books found :C");
+            }
+            else{
+                System.out.println("Match found printing data... ");
+                System.out.println(response);
+            }
+        }
     }
     private String getISBN(){
         //Creating the input scanner
         Scanner idScanner =  new Scanner(System.in);
         System.err.print("Input ISBN "); 
         String isbn = idScanner.nextLine();
-        
         //Removing spaces and dashes from the ISBN
         String cleanedIsbn = isbn.replaceAll("[\\s-]", "");
         
@@ -38,9 +47,9 @@ public class Library{
         //Returns the new ISBN to main function
         return cleanedIsbn;
         }
-    private void bookData(String isbn){
+    private String bookData(String isbn){
         //HTTPS fetch 
-        String targetUrl = "https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn + "&key=" + apiKey;
+        String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",isbn,apiKey);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(targetUrl))
@@ -53,14 +62,18 @@ public class Library{
                 if (response.statusCode() == 200) {
                     System.out.println("--- API Response Data ---");
                     System.out.println(response.body());
+                    return response.body();
                 } 
                 else {
                     System.out.println("Failed to fetch data. HTTP Status: " + response.statusCode());
+                    return null;
                 }
             }
         catch (IOException | InterruptedException e) {
                 System.err.println("An error occurred during the request: " + e.getMessage());
+                return null;
         }
-
     }
+
 }
+
