@@ -47,6 +47,13 @@ public class Library{
         //Returns the new ISBN to main function
         return cleanedIsbn;
         }
+    /**
+     * Queries the api using a HTTP client
+     * @param isbn gives the function the inputted ISBN number
+     * @return response.body if it finds the book from the given ISBN and null if the query fails
+     * @throws IOExpection  if the systems fails to query
+     * @throws InterruptedException if the user interrupts the query
+     */
     private String bookData(String isbn){
         //HTTPS fetch 
         String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",isbn,apiKey);
