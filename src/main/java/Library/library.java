@@ -8,9 +8,11 @@ import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 public class Library{
     private final String apiKey;
+    private final Scanner idScanner;
     public Library() {
         Dotenv dotenv = Dotenv.load();
         this.apiKey = dotenv.get("API_KEY");
+        this.idScanner = new Scanner(System.in);
     }
 
     public void main(String[] args) {
@@ -20,9 +22,8 @@ public class Library{
     }
     private String getISBN(){
         //Creating the input scanner
-        Scanner idScanner =  new Scanner(System.in);
-        System.err.print("Input ISBN "); 
-        String isbn = idScanner.nextLine();
+        System.out.print("Input ISBN "); 
+        String isbn = this.idScanner.nextLine();
         //Removing spaces and dashes from the ISBN
         String cleanedIsbn = isbn.replaceAll("[\\s-]", "");
         
@@ -35,7 +36,6 @@ public class Library{
         }
         else System.out.print("This ISBN is not valid");
         
-        idScanner.close();
         //Returns the new ISBN to main function
         return cleanedIsbn;
         }
@@ -78,9 +78,21 @@ public class Library{
             System.out.println("No books found :C");
         }
         else if (response.contains("\"totalItems\": 0")) {
+            System.out.println("Failed to find book using ISBN");
+            System.out.println("Insert book name");
+            String kirja = this.idScanner.nextLine();
+            System.out.println("Insert author name");
+            String author = this.idScanner.nextLine();
+            /*Make new method for new HTTP request? or just shove it into this method? */
+            /*Learn a way to parse data from the JSON file and 
+            Display them here */
         }
         else{
-            
+            System.out.println("Found a book matching ISBN");
+            System.out.println("");
+            /*Learn a way to parse data from the JSON file and 
+            Display them here */
+
         }
     }
 
