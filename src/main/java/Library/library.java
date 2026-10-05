@@ -83,6 +83,32 @@ public class Library{
             String kirja = this.idScanner.nextLine();
             System.out.println("Insert author name");
             String author = this.idScanner.nextLine();
+            String sTerm = "intitle:\"" + kirja + "\" inauthor:\"" + author + "\"";
+            //HTTP Starts again
+            String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",sTerm,apiKey);
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(targetUrl))
+                    .GET()
+                    .build();
+            System.out.println("Looking for a book base on the name and author");
+                        try {
+                HttpResponse<String> newResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+                
+                if (newResponse.statusCode() == 200) {
+                    System.out.println("--- API Response Data ---");
+                    System.out.println(newResponse.body());
+                    
+                } 
+                else {
+                    System.out.println("Failed to fetch data. HTTP Status: " + newResponse.statusCode());
+                }
+            }
+        catch (IOException | InterruptedException e) {
+                System.err.println("An error occurred during the request: " + e.getMessage());
+                
+        }
+
             /*Make new method for new HTTP request? or just shove it into this method? */
             /*Learn a way to parse data from the JSON file and 
             Display them here */
