@@ -6,13 +6,21 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
-public class Library{
+public class library{
     private final String apiKey;
     private final Scanner idScanner;
-    public Library() {
+    public library() {
         Dotenv dotenv = Dotenv.load();
         this.apiKey = dotenv.get("API_KEY");
         this.idScanner = new Scanner(System.in);
+        /*Test ISBNs for scanner
+        ISBN-13
+        "Steve Jobs" 9781451648546 Walter Isaacson
+        "Freakonomics" 9780141019017 Steven D. Levitt, Stephen J. Dubner
+        ISBN-10
+        "The Road" 0307277674 Cormac McCarthy
+        "1984" 0451524934 George Orwell
+        */
     }
 
     public void main(String[] args) {
