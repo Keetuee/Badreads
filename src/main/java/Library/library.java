@@ -16,15 +16,7 @@ public class Library{
     public void main(String[] args) {
         String isbn = getISBN();
         String response = bookData(isbn);
-        if (response != null) {
-            if (response.contains("\"totalItems\": 0")) {
-                System.out.println("No books found :C");
-            }
-            else{
-                System.out.println("Match found printing data... ");
-                System.out.println(response);
-            }
-        }
+        tulli(response);
     }
     private String getISBN(){
         //Creating the input scanner
@@ -79,6 +71,16 @@ public class Library{
         catch (IOException | InterruptedException e) {
                 System.err.println("An error occurred during the request: " + e.getMessage());
                 return null;
+        }
+    }
+    public void tulli(String response){
+        if (response == null) {
+            System.out.println("No books found :C");
+        }
+        else if (response.contains("\"totalItems\": 0")) {
+        }
+        else{
+            
         }
     }
 
