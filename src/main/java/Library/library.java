@@ -1,9 +1,11 @@
 package Library;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 public class library{
@@ -37,12 +39,12 @@ public class library{
         
         //restricts the valid inputs for the ISBN
         if (cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
-            System.out.print("Valid ISBN");
+            System.out.println("Valid ISBN");
         }
         else if (cleanedIsbn.isEmpty()) {
             System.out.println("Input empty");
         }
-        else System.out.print("This ISBN is not valid");
+        else System.out.println("This ISBN is not valid");
         
         //Returns the new ISBN to main function
         return cleanedIsbn;
@@ -55,7 +57,6 @@ public class library{
      * @throws InterruptedException if the user interrupts the query
      */
     private String bookData(String isbn){
-        //HTTPS fetch 
         String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",isbn,apiKey);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -64,8 +65,7 @@ public class library{
                 .build();
         System.out.println("Looking for a book matching the ISBN");
             try {
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());                
                 if (response.statusCode() == 200) {
                     System.out.println("--- API Response Data ---");
                     System.out.println(response.body());
@@ -91,10 +91,11 @@ public class library{
             String kirja = this.idScanner.nextLine();
             System.out.println("Insert author name");
             String author = this.idScanner.nextLine();
-            String sTerm = "intitle:\"" + kirja + "\" inauthor:\"" + author + "\"";
+             String sTerm = kirja + " " + author;
             //HTTP Starts again
-            String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",sTerm,apiKey);
-                HttpClient client = HttpClient.newHttpClient();
+            String encodedQuery = URLEncoder.encode(sTerm, StandardCharsets.UTF_8);
+            String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",encodedQuery,apiKey);
+            HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(targetUrl))
                     .GET()
