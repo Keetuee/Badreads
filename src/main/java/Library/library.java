@@ -21,7 +21,7 @@ public class library{
         "Freakonomics" 9780141019017 Steven D. Levitt, Stephen J. Dubner
         ISBN-10
         "The Road" 0307277674 Cormac McCarthy
-        "1984" 0451524934 George Orwell
+        "1984" <0451524934> George Orwell
         */
     }
 
@@ -57,7 +57,7 @@ public class library{
      * @throws InterruptedException if the user interrupts the query
      */
     private String bookData(String isbn){
-        String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",isbn,apiKey);
+        String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s&key=%s&country=FI",isbn,apiKey);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(targetUrl))
