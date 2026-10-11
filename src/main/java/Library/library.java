@@ -21,7 +21,7 @@ public class library{
         "Freakonomics" 9780141019017 Steven D. Levitt, Stephen J. Dubner
         ISBN-10
         "The Road" 0307277674 Cormac McCarthy
-        "1984" <0451524934> George Orwell
+        "1984" 0451524934 George Orwell
         */
     }
 
@@ -71,9 +71,11 @@ public class library{
      * @throws InterruptedException if the user interrupts the query
      */
     private String bookData(String isbn){
-        String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=isbn:%s&key=%s&country=FI",isbn,apiKey);
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
+        
+        String fields = "key,title,author_name,first_publish_year,language,number_of_pages_median,cover_i";
+        String targetUrl = "https://openlibrary.org/search.json?isbn=" + isbn + "&fields=" + fields; 
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(targetUrl))
                 .GET()
                 .build();
@@ -95,6 +97,16 @@ public class library{
                 return null;
         }
     }
+    /**
+     * Tulli checks the received data and either runs a failsafe second search
+     * using Author name and book name or dispalys the found data
+     * 
+     * @param response gives the function the unparsed json file data from the
+     * ISBN quarry
+     * @throws IOException if the systems fails to query
+     * @throws InterruptedException if the user interrupts the query
+     */
+
     public void tulli(String response){
         if (response == null) {
             System.out.println("No books found :C");
@@ -105,10 +117,15 @@ public class library{
             String kirja = this.idScanner.nextLine();
             System.out.println("Insert author name");
             String author = this.idScanner.nextLine();
-             String sTerm = kirja + " " + author;
+
             //HTTP Starts again
-            String encodedQuery = URLEncoder.encode(sTerm, StandardCharsets.UTF_8);
-            String targetUrl = String.format("https://www.googleapis.com/books/v1/volumes?q=:%s&key=%s&country=FI",encodedQuery,apiKey);
+            String encodedKirjaQuery = URLEncoder.encode(kirja, StandardCharsets.UTF_8);
+            String encodedAuthorQuery = URLEncoder.encode(author, StandardCharsets.UTF_8);
+            String fields = "key,title,author_name,first_publish_year,language,number_of_pages_median,cover_i";
+
+
+            String targetUrl = "https://openlibrary.org/search.json?title=" + encodedKirjaQuery +
+            "&author=" + encodedAuthorQuery + "&language=eng" + "&fields=" + fields;
             HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(targetUrl))
