@@ -30,22 +30,36 @@ public class library{
         String response = bookData(isbn);
         tulli(response);
     }
+
+    /**
+     * Takes in user inputted ISBN and runs a do while loop until it 
+     * gets a valid ISBN
+     * 
+     * @return cleanedISBN with space and dashes removed
+     */
     private String getISBN(){
-        //Creating the input scanner
+        String cleanedIsbn;
+
+        //runs a do dhilwe loop until getting a valid ISBN
+
+        do {
         System.out.print("Input ISBN "); 
         String isbn = this.idScanner.nextLine();
+
         //Removing spaces and dashes from the ISBN
-        String cleanedIsbn = isbn.replaceAll("[\\s-]", "");
+        cleanedIsbn = isbn.replaceAll("[\\s-]", "");
+        if (cleanedIsbn.isEmpty()) {
+            System.out.println("The input cannot be empty");
+        }
+        else if (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
+                System.out.println("ISBN contains illegal characters or is too short");
+        }
+
+        }
+        while (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$"));
         
-        //restricts the valid inputs for the ISBN
-        if (cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
             System.out.println("Valid ISBN");
-        }
-        else if (cleanedIsbn.isEmpty()) {
-            System.out.println("Input empty");
-        }
-        else System.out.println("This ISBN is not valid");
-        
+
         //Returns the new ISBN to main function
         return cleanedIsbn;
         }
