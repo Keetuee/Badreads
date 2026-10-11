@@ -8,12 +8,14 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 public class library{
-    private final String apiKey;
     private final Scanner idScanner;
     public library() {
         Dotenv dotenv = Dotenv.load();
-        this.apiKey = dotenv.get("API_KEY");
         this.idScanner = new Scanner(System.in);
         /*Test ISBNs for scanner
         ISBN-13
