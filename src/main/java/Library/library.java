@@ -42,7 +42,7 @@ public class library{
     private String getISBN(){
         String cleanedIsbn;
 
-        //runs a do dhilwe loop until getting a valid ISBN
+        //runs a do while loop until getting a valid ISBN
 
         do {
         System.out.print("Input ISBN "); 
@@ -54,7 +54,7 @@ public class library{
             System.out.println("The input cannot be empty");
         }
         else if (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
-                System.out.println("ISBN contains illegal characters or is too short");
+                System.out.println("Illegal ISBN format");
         }
 
         }
