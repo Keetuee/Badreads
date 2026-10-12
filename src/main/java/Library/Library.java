@@ -13,9 +13,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class library {
+public class Library {
     private final Scanner idScanner;
-    public library() {
+    public Library() {
         this.idScanner = new Scanner(System.in);
         /*Test ISBNs for scanner
         ISBN-13
@@ -27,7 +27,7 @@ public class library {
         WHEN TESTING FAILSAFE SEARCH 1324657890
         */
     }
-
+ //TODO: Add a loop so you can search for many books and quit with q
     public void main(String[] args) {
         String isbn = getISBN();
         String response = bookData(isbn);
