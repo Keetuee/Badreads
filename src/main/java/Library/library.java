@@ -7,6 +7,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+
+import javax.print.DocFlavor.STRING;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -22,15 +25,19 @@ public class library{
         "Steve Jobs" 9781451648546 Walter Isaacson
         "Freakonomics" 9780141019017 Steven D. Levitt, Stephen J. Dubner
         ISBN-10
-        "The Road" 0307277674 Cormac McCarthy
+        "The Road" 0307387895  Cormac McCarthy
         "1984" 0451524934 George Orwell
+        WHEN TESTING FAILSAFE SEARCH 1324657890
         */
     }
 
     public void main(String[] args) {
         String isbn = getISBN();
         String response = bookData(isbn);
-        tulli(response);
+        String checkedResponse = tulli(response);
+        lastChance(checkedResponse);
+        
+        //TODO: make a new function that parses JSON
     }
 
     /**
@@ -52,7 +59,7 @@ public class library{
         cleanedIsbn = isbn.replaceAll("[\\s-]", "");
         if (cleanedIsbn.isEmpty()) {
             System.out.println("The input cannot be empty");
-        }
+        } 
         else if (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
                 System.out.println("Illegal ISBN format");
         }
@@ -61,7 +68,7 @@ public class library{
         while (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$"));
         
             System.out.println("Valid ISBN");
-
+        
         //Returns the new ISBN to main function
         return cleanedIsbn;
         }
@@ -85,8 +92,6 @@ public class library{
             try {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());                
                 if (response.statusCode() == 200) {
-                    System.out.println("--- API Response Data ---");
-                    System.out.println(response.body());
                     return response.body();
                 } 
                 else {
@@ -101,7 +106,7 @@ public class library{
     }
     /**
      * Tulli checks the received data and either runs a failsafe second search
-     * using Author name and book name or dispalys the found data
+     * using Author name and book name or displays the found data
      * 
      * @param response gives the function the unparsed json file data from the
      * ISBN quarry
@@ -109,12 +114,10 @@ public class library{
      * @throws InterruptedException if the user interrupts the query
      */
 
-    public void tulli(String response){
-        if (response == null) {
-            System.out.println("No books found :C");
-        }
-        else if (response.contains("\"totalItems\": 0")) {
+    private String tulli(String response){
+        if (response == null || response.contains("\"num_found\":0") ) {
             System.out.println("Failed to find book using ISBN");
+        
             System.out.println("Insert book name");
             String kirja = this.idScanner.nextLine();
             System.out.println("Insert author name");
@@ -125,7 +128,6 @@ public class library{
             String encodedAuthorQuery = URLEncoder.encode(author, StandardCharsets.UTF_8);
             String fields = "key,title,author_name,first_publish_year,language,number_of_pages_median,cover_i";
 
-
             String targetUrl = "https://openlibrary.org/search.json?title=" + encodedKirjaQuery +
             "&author=" + encodedAuthorQuery + "&language=eng" + "&fields=" + fields;
             HttpClient client = HttpClient.newHttpClient();
@@ -133,35 +135,41 @@ public class library{
                     .uri(URI.create(targetUrl))
                     .GET()
                     .build();
-            System.out.println("Looking for a book base on the name and author");
+            System.out.println("Looking for a book based on the name and author");
                         try {
                 HttpResponse<String> newResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
                 
                 if (newResponse.statusCode() == 200) {
                     System.out.println("--- API Response Data ---");
-                    System.out.println(newResponse.body());
+                    return newResponse.body();
                     
                 } 
                 else {
                     System.out.println("Failed to fetch data. HTTP Status: " + newResponse.statusCode());
+                     return null;
                 }
             }
         catch (IOException | InterruptedException e) {
                 System.err.println("An error occurred during the request: " + e.getMessage());
+                 return null;
                 
         }
 
-            /*Make new method for new HTTP request? or just shove it into this method? */
-            /*Learn a way to parse data from the JSON file and 
-            Display them here */
-        }
-        else{
-            System.out.println("Found a book matching ISBN");
-            System.out.println("");
-            /*Learn a way to parse data from the JSON file and 
-            Display them here */
 
         }
+        else{
+           return response;
+
+        }
+    }
+
+    private void lastChance(String checkedResponse){
+//TODO: make a new function that parses JSON
+        System.out.println("\n==================================");
+        System.out.println("📖 BOOK INFORMATION");
+        System.out.println("==================================");
+        System.out.println(checkedResponse);
+
     }
 
 }
