@@ -13,12 +13,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 public class library {
     private final Scanner idScanner;
     public library() {
-        Dotenv dotenv = Dotenv.load();
         this.idScanner = new Scanner(System.in);
         /*Test ISBNs for scanner
         ISBN-13
