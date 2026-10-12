@@ -7,15 +7,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-
 import javax.print.DocFlavor.STRING;
-
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class library{
+public class library {
     private final Scanner idScanner;
     public library() {
         Dotenv dotenv = Dotenv.load();
@@ -44,18 +42,18 @@ public class library{
      * Takes in user inputted ISBN and runs a do while loop until it 
      * gets a valid ISBN
      * 
-     * @return cleanedISBN with space and dashes removed
+     * @return cleanedISBN with whitespace and hyphens removed
      */
-    private String getISBN(){
+    private String getISBN() {
         String cleanedIsbn;
 
-        //runs a do while loop until getting a valid ISBN
+        //runs a do while loop until a valid ISBN is given
 
         do {
         System.out.print("Input ISBN "); 
         String isbn = this.idScanner.nextLine();
 
-        //Removing spaces and dashes from the ISBN
+        //Removing whitespace and hyphens from the ISBN
         cleanedIsbn = isbn.replaceAll("[\\s-]", "");
         if (cleanedIsbn.isEmpty()) {
             System.out.println("The input cannot be empty");
@@ -79,7 +77,7 @@ public class library{
      * @throws IOExpection  if the systems fails to query
      * @throws InterruptedException if the user interrupts the query
      */
-    private String bookData(String isbn){
+    private String bookData(String isbn) {
         
         String fields = "key,title,author_name,first_publish_year,language,number_of_pages_median,cover_i";
         String targetUrl = "https://openlibrary.org/search.json?isbn=" + isbn + "&fields=" + fields; 
@@ -106,15 +104,16 @@ public class library{
     }
     /**
      * Tulli checks the received data and either runs a failsafe second search
-     * using Author name and book name or displays the found data
+     * using Author name and book name or returns the valid book data
+     * @return response if it's not null or doesn't contain "\"num_found\":0"
+     * @return newResponse.body if a second search is needed and null if the search fails
+     * @param response gives the function the unparsed json file data from the ISBN quarry
      * 
-     * @param response gives the function the unparsed json file data from the
-     * ISBN quarry
      * @throws IOException if the systems fails to query
      * @throws InterruptedException if the user interrupts the query
      */
 
-    private String tulli(String response){
+    private String tulli(String response) {
         if (response == null || response.contains("\"num_found\":0") ) {
             System.out.println("Failed to find book using ISBN");
         
@@ -136,40 +135,59 @@ public class library{
                     .GET()
                     .build();
             System.out.println("Looking for a book based on the name and author");
-                        try {
-                HttpResponse<String> newResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+                try {
+                    HttpResponse<String> newResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
                 
-                if (newResponse.statusCode() == 200) {
-                    System.out.println("--- API Response Data ---");
+                    if (newResponse.statusCode() == 200) {
                     return newResponse.body();
                     
-                } 
-                else {
-                    System.out.println("Failed to fetch data. HTTP Status: " + newResponse.statusCode());
-                     return null;
+                    } 
+                    else {
+                        System.out.println("Failed to fetch data. HTTP Status: " + newResponse.statusCode());
+                        return null;
+                    }
                 }
-            }
         catch (IOException | InterruptedException e) {
                 System.err.println("An error occurred during the request: " + e.getMessage());
-                 return null;
+                return null;
                 
         }
 
 
         }
-        else{
+        else {
            return response;
 
         }
     }
 
-    private void lastChance(String checkedResponse){
-//TODO: make a new function that parses JSON
-        System.out.println("\n==================================");
-        System.out.println("📖 BOOK INFORMATION");
-        System.out.println("==================================");
-        System.out.println(checkedResponse);
+    /**
+     * lastChance is the final check function it either prints a fail message in the case of 
+     * a error during the search or if no book was found with the ISBN or the name and author 
+     * of the book
+     * After this if there is a json file with data to parse, it parses it and prints the data
+     * in a easy to view format using imported google.gson classes
+     * 
+     * 
+     * @param checkedResponse the received data that was checked in the tulli function
+     */
+    //TODO: make a new function that parses JSON
+    private void lastChance(String checkedResponse) {
+        if (checkedResponse == null) {
+            System.out.println("An error occured during search");
+        }
+        else if (checkedResponse.contains("\"num_found\":0")) {
+            System.out.println("No books found");
+        }
+        else {
+            
 
+
+            System.out.println("\n==================================");
+            System.out.println("BOOK INFORMATION");
+            System.out.println("==================================");
+            System.out.println(checkedResponse);
+        }
     }
 
 }
