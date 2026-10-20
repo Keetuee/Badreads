@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "C:\PROGRA~1\Git\bin\bash.exe --login -i -c ./run.sh"
