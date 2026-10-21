@@ -29,7 +29,14 @@ public class Library {
     }
  //TODO: Add a loop so you can search for many books and quit with q
     public void main(String[] args) {
-        String isbn = getISBN();
+        String isbn;
+        do {
+            isbn = getISBN();
+        if(isbn == null || isbn.equalsIgnoreCase("q")) {
+            System.out.println("Exiting program. Goodbye!");
+            break;
+        }
+
         String response = bookData(isbn);
         String checkedResponse = tulli(response); 
 
@@ -42,6 +49,8 @@ public class Library {
         else {
             lastChanceMulti(checkedResponse);
         }   
+        }
+        while (true);
         
     }
 
@@ -57,15 +66,18 @@ public class Library {
         //runs a do while loop until a valid ISBN is given
 
         do {
-        System.out.print("Input ISBN "); 
+        System.out.print("Input ISBN or input \"q\" to quit "); 
         String isbn = this.idScanner.nextLine();
         //Removing whitespace and hyphens from the ISBN
         cleanedIsbn = isbn.replaceAll("[\\s-]", "");
         if (cleanedIsbn.isEmpty()) {
             System.out.println("The input cannot be empty");
         } 
+        else if (cleanedIsbn.equals("q")) {
+            return cleanedIsbn;
+        }
         else if (!cleanedIsbn.matches("^([0-9X]{10}|[0-9]{13})$")) {
-                System.out.println("Illegal ISBN format");
+            System.out.println("Illegal ISBN format");
         }
 
         }
