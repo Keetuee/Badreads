@@ -15,6 +15,7 @@ import com.google.gson.JsonParser;
 
 public class Library {
     private final Scanner idScanner;
+    private String searchedTitle = null;
     public Library() {
         this.idScanner = new Scanner(System.in);
         /*Test ISBNs for scanner
@@ -27,19 +28,17 @@ public class Library {
         WHEN TESTING FAILSAFE SEARCH 1324657890
         */
     }
- //TODO: Add a loop so you can search for many books and quit with q
     public void main(String[] args) {
         String isbn;
         do {
+            searchedTitle = null;
             isbn = getISBN();
         if(isbn == null || isbn.equalsIgnoreCase("q")) {
             System.out.println("Exiting program. Goodbye!");
             break;
         }
-
         String response = bookData(isbn);
         String checkedResponse = tulli(response); 
-
         //parses the checkedResponse and finds how many books were found
         JsonObject root = JsonParser.parseString(checkedResponse).getAsJsonObject();
         int numFound = root.get("numFound").getAsInt();
@@ -55,18 +54,20 @@ public class Library {
     }
 
     /**
-     * Takes in user inputted ISBN and runs a do while loop until it 
+     * Takes user inputted ISBN and runs a do while loop until it 
      * gets a valid ISBN
-     * 
+     * Unless the exit input is given "q"
      * @return cleanedISBN with whitespace and hyphens removed
+     * @return cleanedISBN with the letter q which quits the program
      */
     private String getISBN() {
         String cleanedIsbn;
 
         //runs a do while loop until a valid ISBN is given
-
+        //or until the exit input is given
         do {
-        System.out.print("Input ISBN or input \"q\" to quit "); 
+        System.out.println("Input ISBN to search for books");
+        System.out.println("Input \"q\" to quit");
         String isbn = this.idScanner.nextLine();
         //Removing whitespace and hyphens from the ISBN
         cleanedIsbn = isbn.replaceAll("[\\s-]", "");
@@ -105,8 +106,7 @@ public class Library {
                 .GET()
                 .build();
         System.out.println("Looking for a book matching the ISBN");
-            try {
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());                
+            try {                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());                
                 if (response.statusCode() == 200) {
                     return response.body();
                 } 
@@ -130,21 +130,18 @@ public class Library {
      * @throws IOException if the systems fails to query
      * @throws InterruptedException if the user interrupts the query
      */
-
     private String tulli(String response) {
         if (response == null || response.contains("\"numFound\":0") ) {
             System.out.println("Failed to find book using ISBN");
-        
             System.out.println("Insert book name");
             String kirja = this.idScanner.nextLine();
+            this.searchedTitle = kirja.trim();
             System.out.println("Insert author name");
             String author = this.idScanner.nextLine();
-
             //HTTP Starts again
             String encodedKirjaQuery = URLEncoder.encode(kirja, StandardCharsets.UTF_8);
             String encodedAuthorQuery = URLEncoder.encode(author, StandardCharsets.UTF_8);
             String fields = "key,title,author_name,first_publish_year,number_of_pages_median,cover_i,isbn";
-
             String targetUrl = "https://openlibrary.org/search.json?title=" + encodedKirjaQuery +
             "&author=" + encodedAuthorQuery + "&language=eng" + "&fields=" + fields;
             HttpClient client = HttpClient.newHttpClient();
@@ -175,7 +172,6 @@ public class Library {
            return response;
         }
     }
-
     /**
      * lastChanceSingle is the final check function for when only 1 book is found usually by ISBN
      * it either prints a fail message in the case of an error during the search
@@ -242,11 +238,10 @@ public class Library {
             System.out.println("Image ID: " + coverId);
             System.out.println("ISBN: " + isbn);
             System.out.println("==================================");
-
         }
     }
-        
-     private void lastChanceMulti(String checkedResponse){
+    //TODO: work on the filter methods and codes
+    private void lastChanceMulti(String checkedResponse){
         if (checkedResponse == null) {
             System.out.println("An error occured during search");
         }
@@ -256,28 +251,28 @@ public class Library {
         else {
             JsonObject root = JsonParser.parseString(checkedResponse).getAsJsonObject();
             JsonArray docs = root.getAsJsonArray("docs");
-
             int number = 1;
             for (JsonElement element : docs) {
                 JsonObject book = element.getAsJsonObject();
-
-                String title = book.has("title")
-                ? book.get("title").getAsString() : "Unknown";
-
-            String author = "Unknown";
-            if (book.has("author_name") && book.getAsJsonArray("author_name").size() > 0) {
-            author = book.getAsJsonArray("author_name").get(0).getAsString();
+                // Skip books that don't have every field we want
+                //By calling the hasValue and hasNonEmptyArray funtions
+                if (!hasValue(book, "title")
+                    || !hasNonEmptyArray(book, "author_name")
+                    || !hasValue(book, "number_of_pages_median")
+                    || !hasValue(book, "first_publish_year")
+                    || !hasValue(book, "cover_i")
+                    || !hasNonEmptyArray(book, "isbn")) {                    
+                    continue;
+                }
+            String title = book.get("title").getAsString();
+            // If the user searched by name, skip titles that aren't an exact match
+            if (searchedTitle != null && !title.equalsIgnoreCase(searchedTitle)) {
+                continue;
             }
-        
-            String pages = book.has("number_of_pages_median")
-            ? String.valueOf(book.get("number_of_pages_median").getAsInt()) : "Unknown";
-
-            String year = book.has("first_publish_year")
-            ? String.valueOf(book.get("first_publish_year").getAsInt()) : "Unknown";
-
-            String coverId = book.has("cover_i")
-            ? String.valueOf(book.get("cover_i").getAsInt()) : "None";
-
+            String author = book.getAsJsonArray("author_name").get(0).getAsString();
+            String pages = String.valueOf(book.get("number_of_pages_median").getAsInt());
+            String year = String.valueOf(book.get("first_publish_year").getAsInt());
+            String coverId = String.valueOf(book.get("cover_i").getAsInt());
             // ISBN: prefer the first 13-digit one, fall back to whatever comes first
             String isbn = "Unknown";
             if (book.has("isbn")) {
@@ -292,9 +287,7 @@ public class Library {
                 if (isbn.equals("Unknown") && isbns.size() > 0) {
                     isbn = isbns.get(0).getAsString();
                 }
-        }
-
-            
+            }
             System.out.println("\n==================================");
             System.out.println("\n--- Result " + number + " ---");
             System.out.println("==================================");
@@ -310,6 +303,14 @@ public class Library {
             }
 
         }
+        }
+        private boolean hasValue(JsonObject obj, String key) {
+        return obj.has(key) && !obj.get(key).isJsonNull();
+        }
+         private boolean hasNonEmptyArray(JsonObject obj, String key) {
+        return hasValue(obj, key)
+                && obj.get(key).isJsonArray()
+                && obj.getAsJsonArray(key).size() > 0;
         }
 }
 
