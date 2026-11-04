@@ -15,7 +15,7 @@ import com.google.gson.JsonParser;
 
 public class Library {
     private final Scanner idScanner;
-    private String searchedTitle = null;
+    String searchedTitle;
     public Library() {
         this.idScanner = new Scanner(System.in);
         /*Test ISBNs for scanner
@@ -169,7 +169,7 @@ public class Library {
 
         }
         else {
-           return response;
+            return response;
         }
     }
     /**
@@ -265,10 +265,6 @@ public class Library {
                     continue;
                 }
             String title = book.get("title").getAsString();
-            // If the user searched by name, skip titles that aren't an exact match
-            if (searchedTitle != null && !title.equalsIgnoreCase(searchedTitle)) {
-                continue;
-            }
             String author = book.getAsJsonArray("author_name").get(0).getAsString();
             String pages = String.valueOf(book.get("number_of_pages_median").getAsInt());
             String year = String.valueOf(book.get("first_publish_year").getAsInt());
@@ -307,7 +303,7 @@ public class Library {
         private boolean hasValue(JsonObject obj, String key) {
         return obj.has(key) && !obj.get(key).isJsonNull();
         }
-         private boolean hasNonEmptyArray(JsonObject obj, String key) {
+        private boolean hasNonEmptyArray(JsonObject obj, String key) {
         return hasValue(obj, key)
                 && obj.get(key).isJsonArray()
                 && obj.getAsJsonArray(key).size() > 0;
